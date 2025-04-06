@@ -25,34 +25,33 @@ Este é um projeto desenvolvido em Laravel para o teste técnico da vaga de Dese
 - DomPDF
 - MySQL
 
-## 📥 Instalação
+
+## ⚙️ Instalação e Execução
 
 ```bash
-# Clone o repositório
-https://github.com/seu-usuario/nome-do-repositorio.git
+# 1. Clone o repositório
+git clone https://github.com/seu-usuario/nome-do-repositorio.git
 
-# Acesse a pasta
+# 2. Acesse o diretório
 cd nome-do-repositorio
 
-# Instale as dependências
+# 3. Instale as dependências
 composer install
 npm install && npm run dev
 
-# Configure o .env
+# 4. Copie e configure o arquivo .env
 cp .env.example .env
 
-# Gere a chave da aplicação
+# 5. Gere a chave da aplicação
 php artisan key:generate
 
-# Configure seu banco de dados no .env
+# 6. Configure o banco de dados no .env
 
-# Rode as migrations
+# 7. Rode as migrations
 php artisan migrate
 
-# Popule o usuário de teste
+# 8. (Opcional) Popule o usuário de teste
 php artisan db:seed --class=UsuarioTesteSeeder
-```
-
 ## 👤 Acesso de Teste
 
 ```

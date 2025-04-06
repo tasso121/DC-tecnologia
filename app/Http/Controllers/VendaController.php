@@ -36,42 +36,52 @@ class VendaController extends Controller
         $venda = Venda::create([
             'cliente_id' => $request->cliente_id,
             'usuario_id' => Auth::id(),
-            'valor_total' => 0,
+            'valor_total' => 0, // Será atualizado depois
             'forma_pagamento' => $request->forma_pagamento,
         ]);
-
+    
         $valorTotal = 0;
-
-        foreach ($request->produtos as $produto) {
-            if (isset($produto['nome'], $produto['quantidade'], $produto['preco'])) {
-                $item = new ItemVenda([
+    
+        if ($request->has('produtos')) {
+            foreach ($request->produtos as $produto) {
+                if (!isset($produto['nome'], $produto['quantidade'], $produto['preco'])) {
+                    continue;
+                }
+    
+                $quantidade = floatval($produto['quantidade']);
+                $preco = floatval($produto['preco']);
+                $subtotal = $quantidade * $preco;
+    
+                ItemVenda::create([
+                    'venda_id' => $venda->id,
                     'produto' => $produto['nome'],
-                    'quantidade' => $produto['quantidade'],
-                    'preco_unitario' => $produto['preco'],
+                    'quantidade' => $quantidade,
+                    'preco_unitario' => $preco,
                 ]);
-                $item->venda()->associate($venda);
-                $item->save();
-        
-                $valorTotal += $produto['quantidade'] * $produto['preco'];
+                $subtotal = $quantidade * $preco;
+                $valorTotal += $subtotal;
             }
         }
-        
-        foreach ($request->parcelas as $parcela) {
-            if (isset($parcela['data_vencimento'], $parcela['valor'])) {
-                $novaParcela = new Parcela([
+    
+        if ($request->has('parcelas')) {
+            foreach ($request->parcelas as $parcela) {
+                if (!isset($parcela['data_vencimento'], $parcela['valor'])) {
+                    continue;
+                }
+    
+                Parcela::create([
+                    'venda_id' => $venda->id,
                     'data_vencimento' => $parcela['data_vencimento'],
                     'valor' => $parcela['valor'],
                 ]);
-                $novaParcela->venda()->associate($venda);
-                $novaParcela->save();
             }
         }
-        
-
+    
         $venda->update(['valor_total' => $valorTotal]);
-
+    
         return redirect()->route('vendas.index')->with('sucesso', 'Venda cadastrada com sucesso!');
     }
+    
 
     public function edit(Venda $venda)
     {
@@ -90,25 +100,36 @@ class VendaController extends Controller
         $valorTotal = 0;
 
         foreach ($request->produtos as $produto) {
-            $item = new ItemVenda([
-                'produto' => $produto['nome'],
-                'quantidade' => $produto['quantidade'],
-                'preco_unitario' => $produto['preco'],
-            ]);
-            $item->venda()->associate($venda);
-            $item->save();
-
-            $valorTotal += $produto['quantidade'] * $produto['preco'];
+            if (isset($produto['nome'], $produto['quantidade'], $produto['preco'])) {
+                $quantidade = floatval($produto['quantidade']);
+                $preco = floatval($produto['preco']);
+                $subtotal = $quantidade * $preco;
+                
+                $item = new ItemVenda([
+                    'produto' => $produto['nome'],
+                    'quantidade' => $produto['quantidade'],
+                    'preco_unitario' => $produto['preco'],
+                ]);
+                $item->venda()->associate($venda);
+                $item->save();
+        
+                $subtotal = $quantidade * $preco;
+                $valorTotal += $subtotal;
+            }
         }
+        
 
         foreach ($request->parcelas as $parcela) {
-            $novaParcela = new Parcela([
-                'data_vencimento' => $parcela['data_vencimento'],
-                'valor' => $parcela['valor'],
-            ]);
-            $novaParcela->venda()->associate($venda);
-            $novaParcela->save();
+            if (isset($parcela['data_vencimento'], $parcela['valor'])) {
+                $novaParcela = new Parcela([
+                    'data_vencimento' => $parcela['data_vencimento'],
+                    'valor' => $parcela['valor'],
+                ]);
+                $novaParcela->venda()->associate($venda);
+                $novaParcela->save();
+            }
         }
+        
 
         $venda->update(['valor_total' => $valorTotal]);
 

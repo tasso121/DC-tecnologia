@@ -29,3 +29,4 @@ Route::middleware(['auth'])->group(function () {
     Route::get('vendas/{venda}/pdf', [PDFController::class, 'gerarResumo'])->name('vendas.pdf');
     Route::post('parcelas/{parcela}/pagar', [ParcelaController::class, 'marcarComoPaga'])->name('parcelas.pagar');
 });
+Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->middleware('auth')->name('dashboard');
