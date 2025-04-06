@@ -43,25 +43,30 @@ class VendaController extends Controller
         $valorTotal = 0;
 
         foreach ($request->produtos as $produto) {
-            $item = new ItemVenda([
-                'produto' => $produto['nome'],
-                'quantidade' => $produto['quantidade'],
-                'preco_unitario' => $produto['preco'],
-            ]);
-            $item->venda()->associate($venda);
-            $item->save();
-
-            $valorTotal += $produto['quantidade'] * $produto['preco'];
+            if (isset($produto['nome'], $produto['quantidade'], $produto['preco'])) {
+                $item = new ItemVenda([
+                    'produto' => $produto['nome'],
+                    'quantidade' => $produto['quantidade'],
+                    'preco_unitario' => $produto['preco'],
+                ]);
+                $item->venda()->associate($venda);
+                $item->save();
+        
+                $valorTotal += $produto['quantidade'] * $produto['preco'];
+            }
         }
-
+        
         foreach ($request->parcelas as $parcela) {
-            $novaParcela = new Parcela([
-                'data_vencimento' => $parcela['data_vencimento'],
-                'valor' => $parcela['valor'],
-            ]);
-            $novaParcela->venda()->associate($venda);
-            $novaParcela->save();
+            if (isset($parcela['data_vencimento'], $parcela['valor'])) {
+                $novaParcela = new Parcela([
+                    'data_vencimento' => $parcela['data_vencimento'],
+                    'valor' => $parcela['valor'],
+                ]);
+                $novaParcela->venda()->associate($venda);
+                $novaParcela->save();
+            }
         }
+        
 
         $venda->update(['valor_total' => $valorTotal]);
 

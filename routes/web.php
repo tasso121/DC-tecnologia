@@ -2,6 +2,10 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\VendaController;
+use App\Http\Controllers\PDFController;
+use App\Http\Controllers\ParcelaController;
 
 Route::get('/', function () {
     return view('welcome');
