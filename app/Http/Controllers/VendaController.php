@@ -58,7 +58,6 @@ class VendaController extends Controller
                     'quantidade' => $quantidade,
                     'preco_unitario' => $preco,
                 ]);
-                $subtotal = $quantidade * $preco;
                 $valorTotal += $subtotal;
             }
         }
